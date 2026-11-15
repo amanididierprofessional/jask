@@ -12,13 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CampusRouteImport } from './routes/campus'
 import { Route as AuthenticatedAskRouteImport } from './routes/_authenticated/ask'
+import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as AuthenticatedMeRouteImport } from './routes/_authenticated/me'
 import { Route as AuthenticatedNotesRouteImport } from './routes/_authenticated/notes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
-import { Route as ModulesIndexRouteImport } from './routes/modules.index'
-import { Route as ModulesCourseIdRouteImport } from './routes/modules.$courseId'
+import { Route as CommunitiesIndexRouteImport } from './routes/communities.index'
+import { Route as CommunitiesCommunityIdRouteImport } from './routes/communities.$communityId'
 import { Route as QQuestionIdRouteImport } from './routes/q.$questionId'
+import { Route as ApiPublicPushRouteImport } from './routes/api/public/push'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,9 +37,19 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampusRoute = CampusRouteImport.update({
+  id: '/campus',
+  path: '/campus',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAskRoute = AuthenticatedAskRouteImport.update({
   id: '/ask',
   path: '/ask',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCoursesRoute = AuthenticatedCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMeRoute = AuthenticatedMeRouteImport.update({
@@ -54,14 +67,14 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ModulesIndexRoute = ModulesIndexRouteImport.update({
-  id: '/modules/',
-  path: '/modules/',
+const CommunitiesIndexRoute = CommunitiesIndexRouteImport.update({
+  id: '/communities/',
+  path: '/communities/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ModulesCourseIdRoute = ModulesCourseIdRouteImport.update({
-  id: '/modules/$courseId',
-  path: '/modules/$courseId',
+const CommunitiesCommunityIdRoute = CommunitiesCommunityIdRouteImport.update({
+  id: '/communities/$communityId',
+  path: '/communities/$communityId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QQuestionIdRoute = QQuestionIdRouteImport.update({
@@ -69,86 +82,111 @@ const QQuestionIdRoute = QQuestionIdRouteImport.update({
   path: '/q/$questionId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPushRoute = ApiPublicPushRouteImport.update({
+  id: '/api/public/push',
+  path: '/api/public/push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/campus': typeof CampusRoute
   '/ask': typeof AuthenticatedAskRoute
+  '/courses': typeof AuthenticatedCoursesRoute
   '/me': typeof AuthenticatedMeRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/modules/$courseId': typeof ModulesCourseIdRoute
+  '/communities/$communityId': typeof CommunitiesCommunityIdRoute
   '/q/$questionId': typeof QQuestionIdRoute
-  '/modules/': typeof ModulesIndexRoute
+  '/communities/': typeof CommunitiesIndexRoute
+  '/api/public/push': typeof ApiPublicPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/campus': typeof CampusRoute
   '/ask': typeof AuthenticatedAskRoute
+  '/courses': typeof AuthenticatedCoursesRoute
   '/me': typeof AuthenticatedMeRoute
   '/notes': typeof AuthenticatedNotesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/modules/$courseId': typeof ModulesCourseIdRoute
+  '/communities/$communityId': typeof CommunitiesCommunityIdRoute
   '/q/$questionId': typeof QQuestionIdRoute
-  '/modules': typeof ModulesIndexRoute
+  '/communities': typeof CommunitiesIndexRoute
+  '/api/public/push': typeof ApiPublicPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/campus': typeof CampusRoute
   '/_authenticated/ask': typeof AuthenticatedAskRoute
+  '/_authenticated/courses': typeof AuthenticatedCoursesRoute
   '/_authenticated/me': typeof AuthenticatedMeRoute
   '/_authenticated/notes': typeof AuthenticatedNotesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/modules/$courseId': typeof ModulesCourseIdRoute
+  '/communities/$communityId': typeof CommunitiesCommunityIdRoute
   '/q/$questionId': typeof QQuestionIdRoute
-  '/modules/': typeof ModulesIndexRoute
+  '/communities/': typeof CommunitiesIndexRoute
+  '/api/public/push': typeof ApiPublicPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/campus'
     | '/ask'
+    | '/courses'
     | '/me'
     | '/notes'
     | '/onboarding'
-    | '/modules/$courseId'
+    | '/communities/$communityId'
     | '/q/$questionId'
-    | '/modules/'
+    | '/communities/'
+    | '/api/public/push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/campus'
     | '/ask'
+    | '/courses'
     | '/me'
     | '/notes'
     | '/onboarding'
-    | '/modules/$courseId'
+    | '/communities/$communityId'
     | '/q/$questionId'
-    | '/modules'
+    | '/communities'
+    | '/api/public/push'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/campus'
     | '/_authenticated/ask'
+    | '/_authenticated/courses'
     | '/_authenticated/me'
     | '/_authenticated/notes'
     | '/_authenticated/onboarding'
-    | '/modules/$courseId'
+    | '/communities/$communityId'
     | '/q/$questionId'
-    | '/modules/'
+    | '/communities/'
+    | '/api/public/push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ModulesCourseIdRoute: typeof ModulesCourseIdRoute
+  CampusRoute: typeof CampusRoute
+  CommunitiesCommunityIdRoute: typeof CommunitiesCommunityIdRoute
   QQuestionIdRoute: typeof QQuestionIdRoute
-  ModulesIndexRoute: typeof ModulesIndexRoute
+  CommunitiesIndexRoute: typeof CommunitiesIndexRoute
+  ApiPublicPushRoute: typeof ApiPublicPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,11 +212,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/campus': {
+      id: '/campus'
+      path: '/campus'
+      fullPath: '/campus'
+      preLoaderRoute: typeof CampusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/ask': {
       id: '/_authenticated/ask'
       path: '/ask'
       fullPath: '/ask'
       preLoaderRoute: typeof AuthenticatedAskRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/courses': {
+      id: '/_authenticated/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof AuthenticatedCoursesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/me': {
@@ -202,18 +254,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/modules/': {
-      id: '/modules/'
-      path: '/modules'
-      fullPath: '/modules/'
-      preLoaderRoute: typeof ModulesIndexRouteImport
+    '/communities/': {
+      id: '/communities/'
+      path: '/communities'
+      fullPath: '/communities/'
+      preLoaderRoute: typeof CommunitiesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/modules/$courseId': {
-      id: '/modules/$courseId'
-      path: '/modules/$courseId'
-      fullPath: '/modules/$courseId'
-      preLoaderRoute: typeof ModulesCourseIdRouteImport
+    '/communities/$communityId': {
+      id: '/communities/$communityId'
+      path: '/communities/$communityId'
+      fullPath: '/communities/$communityId'
+      preLoaderRoute: typeof CommunitiesCommunityIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/q/$questionId': {
@@ -223,11 +275,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QQuestionIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/push': {
+      id: '/api/public/push'
+      path: '/api/public/push'
+      fullPath: '/api/public/push'
+      preLoaderRoute: typeof ApiPublicPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAskRoute: typeof AuthenticatedAskRoute
+  AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
   AuthenticatedMeRoute: typeof AuthenticatedMeRoute
   AuthenticatedNotesRoute: typeof AuthenticatedNotesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -235,6 +295,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAskRoute: AuthenticatedAskRoute,
+  AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
   AuthenticatedMeRoute: AuthenticatedMeRoute,
   AuthenticatedNotesRoute: AuthenticatedNotesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
@@ -247,9 +308,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ModulesCourseIdRoute: ModulesCourseIdRoute,
+  CampusRoute: CampusRoute,
+  CommunitiesCommunityIdRoute: CommunitiesCommunityIdRoute,
   QQuestionIdRoute: QQuestionIdRoute,
-  ModulesIndexRoute: ModulesIndexRoute,
+  CommunitiesIndexRoute: CommunitiesIndexRoute,
+  ApiPublicPushRoute: ApiPublicPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, CircleHelp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { avatarSrc } from "@/lib/avatars";
 import { initials } from "@/lib/format";
@@ -13,17 +13,18 @@ export function Avatar({
   className,
 }: {
   name: string;
-  url?: string | null;
+  url?: string | null | undefined;
   size?: number;
-  ring?: "white" | "brand" | "win";
-  className?: string;
+  ring?: "white" | "brand" | "win" | undefined;
+  className?: string | undefined;
 }) {
-  const src = avatarSrc(url);
+  const [failed, setFailed] = useState(false);
+  const src = failed ? null : avatarSrc(url);
   const ringCls = ring === "white" ? "ring-2 ring-card" : ring === "brand" ? "ring-2 ring-brand" : ring === "win" ? "ring-2 ring-win" : "";
   const style = { width: size, height: size };
   if (src)
     return (
-      <img src={src} alt={name} loading="lazy" width={size} height={size} style={style} className={cn("shrink-0 rounded-full object-cover", ringCls, className)} />
+      <img src={src} onError={() => setFailed(true)} alt={name} loading="lazy" width={size} height={size} style={style} className={cn("shrink-0 rounded-full object-cover", ringCls, className)} />
     );
   return (
     <span
@@ -51,7 +52,7 @@ export function Card({ children, className }: { children: ReactNode; className?:
 export function BrandMark({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-1.5 font-display text-[13px] font-black text-brand", className)}>
-      <span className="grid h-5 w-5 place-items-center rounded-md bg-brand text-[11px] text-brand-foreground">J</span>
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-brand text-brand-foreground"><CircleHelp className="h-6 w-6" strokeWidth={2.5} /></span>
       Jask
     </div>
   );

@@ -1,6 +1,6 @@
-export function classLabel(p: { major?: string | null; grad_year?: number | null } | null | undefined) {
+export function classLabel(p: { major?: string | null; study_year?: number | null } | null | undefined) {
   if (!p) return "";
-  const yr = p.grad_year ? `'${String(p.grad_year).slice(-2)}` : "";
+  const yr = p.study_year ? `Year ${p.study_year}` : "";
   return [p.major, yr].filter(Boolean).join(" ");
 }
 
@@ -21,7 +21,7 @@ export function initials(name: string) {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
+    .map((w) => w[0]?.toUpperCase())
     .join("");
 }
 

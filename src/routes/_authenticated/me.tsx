@@ -1,48 +1,15 @@
-import { useEffect } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
-import { notificationsQuery } from "@/lib/queries";
-import { classLabel, timeAgo } from "@/lib/format";
-import { Avatar, Card } from "@/components/jask/ui";
-
-export const Route = createFileRoute("/_authenticated/me")({
-  head: () => ({ meta: [{ title: "Me — Jask" }, { name: "description", content: "Your Jask profile and notifications." }] }),
-  component: Me,
-});
-
-const verb = { answer: "answered your question", invite: "invited you to answer", accepted: "accepted your answer" } as Record<string, string>;
-
-function Me() {
-  const { userId, profile } = useAuth();
-  const nav = useNavigate();
-  const qc = useQueryClient();
-  const n = useQuery(notificationsQuery(userId));
-  useEffect(() => {
-    if (n.data?.some((x) => !x.read)) {
-      const t = setTimeout(async () => { await supabase.from("notifications").update({ read: true }).eq("user_id", userId!).eq("read", false); qc.invalidateQueries({ queryKey: ["me", "notifications"] }); }, 2000);
-      return () => clearTimeout(t);
-    }
-  }, [n.data, userId, qc]);
-  return (
-    <div className="flex flex-col gap-4 px-4 pt-4">
-      <h1 className="px-1 text-[24px] font-black">Me</h1>
-      <Card className="flex items-center gap-4">
-        <Avatar name={profile?.full_name ?? ""} url={profile?.avatar_url} size={56} />
-        <div className="flex-1"><p className="font-display text-[18px] font-extrabold">{profile?.full_name}</p><p className="text-[13px] text-mute">{classLabel(profile)}</p></div>
-        <Link to="/onboarding" className="h-10 rounded-full border border-ink/10 px-4 pt-2.5 text-[13px] font-semibold">Edit</Link>
-      </Card>
-      <h2 className="px-1 text-[18px] font-black">Notifications</h2>
-      {n.data?.length === 0 && <p className="px-1 text-[13px] text-mute">No notifications yet. Ask a question to get started.</p>}
-      {n.data?.map((x) => (
-        <Link key={x.id} to="/q/$questionId" params={{ questionId: x.question_id ?? "" }} className="flex items-center gap-3 rounded-[18px] bg-card p-3 shadow-card">
-          <Avatar name={x.actor?.full_name ?? ""} url={x.actor?.avatar_url} size={36} />
-          <div className="min-w-0 flex-1"><p className="text-[14px]"><b>{x.actor?.full_name}</b> {verb[x.type]}</p><p className="truncate text-[12px] text-mute">{x.question?.title} · {timeAgo(x.created_at)}</p></div>
-          {!x.read && <span className="h-2 w-2 rounded-full bg-win" />}
-        </Link>
-      ))}
-      <button onClick={async () => { await supabase.auth.signOut(); nav({ to: "/" }); }} className="mt-4 h-11 rounded-full border border-ink/10 text-[13px] font-semibold">Sign out</button>
-    </div>
-  );
-}
+import { createFileRoute,Link,useNavigate } from '@tanstack/react-router';
+import { useQuery,useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth';
+import { supabase } from '@/integrations/supabase/client';
+import { notificationsQuery } from '@/lib/queries';
+import { preferencesQuery } from '@/lib/social-queries';
+import { enablePush } from '@/lib/push';
+import { pageHead } from '@/lib/head';
+import { classLabel,timeAgo } from '@/lib/format';
+import { Avatar } from '@/components/jask/ui';
+export const Route=createFileRoute('/_authenticated/me')({head:()=>pageHead('Me','Your profile and notification preferences on Jask.'),component:Me});
+function Me(){const {userId,profile}=useAuth();const qc=useQueryClient();const nav=useNavigate();const n=useQuery(notificationsQuery(userId));const preferences=useQuery(preferencesQuery(userId));const [busy,setBusy]=useState(false);const p: {enabled:boolean;courses:boolean;communities:boolean;campus:boolean;push_enabled:boolean}=preferences.data??{enabled:true,courses:true,communities:true,campus:false,push_enabled:false};const update=async(values:Partial<typeof p>)=>{if(!userId)return;qc.setQueryData(['me','preferences',userId],{user_id:userId,...p,...values});const {error}=await supabase.from('notification_preferences').upsert({user_id:userId,...p,...values});if(error)toast.error(error.message);else{qc.invalidateQueries({queryKey:['me','preferences']});toast.success('Notification preferences saved')}};const push=async()=>{if(!userId)return;setBusy(true);try{await enablePush(userId);await update({push_enabled:true,enabled:true});toast.success('Notifications enabled for this browser')}catch(e){toast.error((e as Error).message)}finally{setBusy(false)}};return <div className="space-y-6 px-4 pt-5 pb-28"><h1 className="text-2xl font-black">Me</h1><div className="flex items-center gap-3 border-b pb-5"><Avatar name={profile?.full_name??''} url={profile?.avatar_url} size={56}/><div className="min-w-0 flex-1"><p className="text-lg font-bold">{profile?.full_name}</p><p className="text-sm text-mute">{classLabel(profile)}</p></div><Link to="/onboarding" className="text-sm text-brand">Edit</Link></div><section className="space-y-4"><h2 className="text-lg font-black">Notification preferences</h2>{([['enabled','Receive notifications'],['courses','My courses'],['communities','My communities'],['campus','Everything from my campus']] as const).map(([key,label])=><label key={key} className="flex items-center justify-between gap-3 text-sm"><span>{label}</span><input aria-label={label} type="checkbox" checked={Boolean(p[key])} disabled={key!=='enabled'&&!p.enabled} onChange={e=>update({[key]:e.target.checked})}/></label>)}<Button onClick={push} disabled={busy||!p.enabled}>{busy?'Enabling…':p.push_enabled?'Enable on this device':'Enable browser notifications'}</Button>{p.push_enabled&&<Button variant="ghost" onClick={async()=>{if(!userId)return;const {error}=await supabase.from('push_devices').delete().eq('user_id',userId);if(error){toast.error(error.message);return;}await update({push_enabled:false})}}>Disable push on all devices</Button>}</section><section className="space-y-3"><div className="flex items-center justify-between"><h2 className="text-lg font-black">Notifications</h2><Button size="sm" variant="ghost" onClick={async()=>{if(!userId)return;const {error}=await supabase.from('notifications').update({read:true}).eq('user_id',userId);if(error){toast.error(error.message);return;}qc.invalidateQueries({queryKey:['me','notifications']})}}>Mark all read</Button></div>{n.data?.length===0&&<p className="text-sm text-mute">No notifications yet.</p>}{n.data?.filter(x=>x.question_id).map(x=><Link key={x.id} to="/q/$questionId" params={{questionId:x.question_id??''}} className="block border-b py-3"><p className="text-sm font-semibold">{x.type==='accepted'?'An answer was accepted':x.type==='answer'?`${x.actor?.full_name??'Someone'} answered`:'New question for you'}{!x.read&&<span className="ml-2 text-win">●</span>}</p><p className="mt-1 text-xs text-mute">{x.question?.title} · {timeAgo(x.created_at)}</p></Link>)}</section><Button variant="outline" onClick={async()=>{await supabase.auth.signOut();nav({to:'/'})}}>Sign out</Button></div>}

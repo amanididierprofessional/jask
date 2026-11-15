@@ -673,7 +673,7 @@ export type Database = {
           answer_count: number
           author_id: string
           body: string
-          course_id: string
+          course_id: string | null
           created_at: string
           id: string
           institution_id: string | null
@@ -685,7 +685,7 @@ export type Database = {
           answer_count?: number
           author_id: string
           body?: string
-          course_id: string
+          course_id?: string | null
           created_at?: string
           id?: string
           institution_id?: string | null
@@ -697,7 +697,7 @@ export type Database = {
           answer_count?: number
           author_id?: string
           body?: string
-          course_id?: string
+          course_id?: string | null
           created_at?: string
           id?: string
           institution_id?: string | null
@@ -773,7 +773,47 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      community_activity: {
+        Args: never
+        Returns: {
+          activity: number
+          description: string
+          id: string
+          institution_id: string
+          members: number
+          name: string
+          participants: number
+          posts: number
+          slug: string
+        }[]
+      }
+      ranked_questions: {
+        Args: {
+          campus_id?: string
+          community?: string
+          course_ids?: string[]
+          search_text?: string
+          sort_mode?: string
+        }
+        Returns: {
+          accepted_answer_id: string | null
+          answer_count: number
+          author_id: string
+          body: string
+          course_id: string | null
+          created_at: string
+          id: string
+          institution_id: string | null
+          tag: string | null
+          title: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "questions"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never

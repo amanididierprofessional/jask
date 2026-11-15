@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Keep course-first home at `/`, campus discovery at `/campus`, and real community pages separate; this avoids mixing personal subscriptions with campus discovery.
+- Rank feeds in the database with actual votes, responses, unique participants and recency; avoid page-local ranking of a newest-only sample.
+- Store per-user notification preferences and device tokens behind owner-only policies; deliver background notifications through an authenticated scheduled server route.
+- Use private reference storage with signed URLs and author-owned metadata; this preserves ownership while making published references readable.
+- Home-screen installation uses a manifest only; the Firebase messaging worker is for notifications, never an offline app cache.

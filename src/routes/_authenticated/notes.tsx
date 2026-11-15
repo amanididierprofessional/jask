@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -6,7 +7,7 @@ import { CardSkeleton, EmptyState } from "@/components/jask/ui";
 import { QuestionCard } from "@/components/jask/QuestionCard";
 
 export const Route = createFileRoute("/_authenticated/notes")({
-  head: () => ({ meta: [{ title: "Notes — Jask" }, { name: "description", content: "Your saved answers." }] }),
+  head: () => pageHead("Notes", "Your saved questions and answers on Jask."),
   component: Notes,
 });
 

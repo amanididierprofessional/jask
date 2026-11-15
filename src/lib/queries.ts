@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const authorCols = "id, full_name, major, grad_year, role_title, avatar_url";
+const authorCols = "id, full_name, major, study_year, role_title, avatar_url";
 
 export const coursesQuery = () =>
   queryOptions({
@@ -28,23 +28,18 @@ export const institutionsQuery = () =>
     staleTime: 10 * 60_000,
   });
 
-export type FeedFilter = { courseIds?: string[] | null; search?: string; institutionId?: string | null };
+export type FeedFilter = { courseIds?: string[] | null; search?: string; institutionId?: string | null | undefined; communityId?: string | undefined; sort?: string };
 
 export const feedQuery = (f: FeedFilter) =>
   queryOptions({
     queryKey: ["feed", f],
     queryFn: async () => {
-      let q = supabase
-        .from("questions")
-        .select(`id, title, tag, created_at, answer_count, accepted_answer_id, course_id, author:profiles!questions_author_id_fkey(${authorCols}), course:courses(id, code, name)`)
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (f.courseIds) q = q.in("course_id", f.courseIds.length ? f.courseIds : ["00000000-0000-0000-0000-000000000000"]);
-      if (f.institutionId) q = q.eq("institution_id", f.institutionId);
-      if (f.search?.trim()) q = q.ilike("title", `%${f.search.trim().replace(/[%_]/g, "")}%`);
-      const { data, error } = await q;
+      const { data: ranked, error: rankError } = await supabase.rpc("ranked_questions", { ...(f.courseIds ? {course_ids:f.courseIds} : {}), ...(f.institutionId ? {campus_id:f.institutionId} : {}), ...(f.communityId ? {community:f.communityId} : {}), search_text: f.search?.trim() ?? "", sort_mode: f.sort ?? "hot" });
+      if (rankError) throw rankError;
+      if (!ranked.length) return [];
+      const { data, error } = await supabase.from("questions").select(`id, title, tag, created_at, answer_count, accepted_answer_id, course_id, author:profiles!questions_author_id_fkey(${authorCols}), course:courses(id, code, name)`).in("id", ranked.map(r => r.id));
       if (error) throw error;
-      return data;
+      return ranked.flatMap(r => { const item = data.find(q => q.id === r.id); return item ? [item] : []; });
     },
   });
 export type FeedItem = Awaited<ReturnType<NonNullable<ReturnType<typeof feedQuery>["queryFn"]>>>[number];

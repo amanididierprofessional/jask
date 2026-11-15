@@ -3,10 +3,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { pageHead } from "@/lib/head";
 import { BrandMark, Card, PrimaryButton } from "@/components/jask/ui";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Jask" }, { name: "description", content: "Sign in to Jask. Just Ask." }, { property: "og:title", content: "Sign in — Jask" }, { property: "og:description", content: "Find the people. Find the answers." }] }),
+  head: () => pageHead("Sign in", "Join real college and group conversations on Jask."),
   component: AuthPage,
 });
 
@@ -31,7 +32,7 @@ function AuthPage() {
       if (mode === "up") {
         const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, data: { full_name: name } } });
         if (error) throw error;
-        if (data.session) await afterSignIn(data.user!.id);
+        if (data.session) await afterSignIn(data.user?.id ?? "");
         else setSent(true);
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -47,7 +48,7 @@ function AuthPage() {
 
   const google = async () => {
     const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (r.error) return toast.error(String(r.error.message ?? r.error));
+    if (r.error) { toast.error(String(r.error.message ?? r.error)); return; }
     if (r.redirected) return;
     const { data } = await supabase.auth.getUser();
     if (data.user) await afterSignIn(data.user.id);
@@ -70,7 +71,7 @@ function AuthPage() {
         ) : (
           <form onSubmit={submit} className="flex flex-col gap-3">
             {mode === "up" && <input required maxLength={80} placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} className={field} />}
-            <input required type="email" placeholder="University email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
+            <input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
             <input required type="password" minLength={6} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={field} />
             <PrimaryButton type="submit" disabled={busy}>{busy ? "One sec…" : mode === "in" ? "Sign in" : "Create account"}</PrimaryButton>
             <button type="button" onClick={google} className="flex h-12 items-center justify-center gap-2.5 rounded-full border border-[#747775] bg-white text-[14px] font-medium text-[#1F1F1F]">

@@ -41,7 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["me", "profile", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId!).maybeSingle();
+      if (!userId) return null;
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -50,7 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["me", "enrollments", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("enrollments").select("course_id, status").eq("user_id", userId!);
+      if (!userId) return [];
+      const { data, error } = await supabase.from("enrollments").select("course_id, status").eq("user_id", userId);
       if (error) throw error;
       return data;
     },

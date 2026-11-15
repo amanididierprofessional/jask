@@ -9,7 +9,8 @@ export function useMyInvites() {
     queryKey: ["me", "invites", userId],
     enabled: !!userId,
     queryFn: async () => {
-      const { data, error } = await supabase.from("helper_invites").select("question_id, helper_id").eq("inviter_id", userId!);
+      if (!userId) return new Set<string>();
+      const { data, error } = await supabase.from("helper_invites").select("question_id, helper_id").eq("inviter_id", userId);
       if (error) throw error;
       return new Set(data.map((d) => `${d.question_id}:${d.helper_id}`));
     },

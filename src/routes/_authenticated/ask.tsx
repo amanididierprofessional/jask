@@ -1,75 +1,14 @@
-import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
-import { coursesQuery, helpersQuery } from "@/lib/queries";
-import { cn } from "@/lib/utils";
-import { Avatar, BackHeader, Card, EmptyState, PrimaryButton } from "@/components/jask/ui";
-
-export const Route = createFileRoute("/_authenticated/ask")({
-  validateSearch: (s: Record<string, unknown>) => ({ course: typeof s.course === "string" ? s.course : undefined }),
-  head: () => ({ meta: [{ title: "Just Ask — Jask" }, { name: "description", content: "Post a question to your classmates." }] }),
-  component: Ask,
-});
-
-const TAGS = ["Midterm Prep", "Problem Set", "Exam Review", "Proof Help", "Concept Check"];
-
-function Ask() {
-  const { course } = Route.useSearch();
-  const { userId, profile } = useAuth();
-  const nav = useNavigate();
-  const qc = useQueryClient();
-  const courses = useQuery(coursesQuery());
-  const helpers = useQuery(helpersQuery());
-  const [courseId, setCourseId] = useState(course ?? "");
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [tag, setTag] = useState<string | null>(null);
-  const [tagged, setTagged] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-
-  if (profile && !profile.onboarded) return <div className="p-4"><BackHeader title="Just Ask" /><EmptyState title="Finish your profile first" body="Pick your university and courses so the right classmates see your question." action={<Link to="/onboarding" className="flex h-11 items-center rounded-full bg-brand px-5 font-bold text-brand-foreground">Set up profile</Link>} /></div>;
-  const list = (courses.data ?? []).filter((c) => c.institution_id === profile?.institution_id);
-  const peers = (helpers.data ?? []).filter((e) => e.course_id === courseId && e.user && e.user.id !== userId);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!courseId) return toast.error("Pick a module");
-    if (title.trim().length < 8) return toast.error("Give your question a clearer title (8+ characters)");
-    setBusy(true);
-    const { data, error } = await supabase.from("questions").insert({ author_id: userId!, institution_id: profile?.institution_id, course_id: courseId, title: title.trim().slice(0, 200), body: body.trim().slice(0, 5000), tag }).select("id").single();
-    if (error) { setBusy(false); return toast.error(error.message); }
-    if (tagged.length) await supabase.from("helper_invites").insert(tagged.map((h) => ({ question_id: data.id, helper_id: h, inviter_id: userId! })));
-    qc.invalidateQueries({ queryKey: ["feed"] });
-    toast.success("Question published");
-    nav({ to: "/q/$questionId", params: { questionId: data.id } });
-  };
-  const field = "w-full rounded-[18px] border border-ink/10 bg-card px-4 text-[15px] outline-none focus:border-brand";
-  return (
-    <div>
-      <BackHeader title="Just Ask" subtitle="Your classmates are here to help" />
-      <form onSubmit={submit} className="flex flex-col gap-4 px-4 pb-10 pt-2">
-        <Card className="flex flex-col gap-4">
-          <div><p className="mb-1.5 px-1 text-[12px] font-semibold text-mute">Module</p>
-            <div className="flex flex-wrap gap-2">{list.map((c) => <button type="button" key={c.id} onClick={() => { setCourseId(c.id); setTagged([]); }} className={cn("h-9 rounded-full px-3 text-[13px] font-semibold", courseId === c.id ? "bg-brand text-brand-foreground" : "bg-brand/10 text-brand")}>{c.code} · {c.name}</button>)}</div></div>
-          <label><span className="mb-1.5 block px-1 text-[12px] font-semibold text-mute">Question</span><input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} placeholder="What are you stuck on?" className={cn(field, "h-12")} /></label>
-          <label><span className="mb-1.5 block px-1 text-[12px] font-semibold text-mute">Details</span><textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} rows={5} placeholder="Share what you tried, the equation, the step that breaks…" className={cn(field, "py-3")} /></label>
-          <div><p className="mb-1.5 px-1 text-[12px] font-semibold text-mute">Tag (optional)</p><div className="flex flex-wrap gap-2">{TAGS.map((t) => <button type="button" key={t} onClick={() => setTag(tag === t ? null : t)} className={cn("h-9 rounded-full border px-3 text-[13px] font-semibold", tag === t ? "border-brand bg-brand/10 text-brand" : "border-ink/10")}>{t}</button>)}</div></div>
-        </Card>
-        {courseId && (
-          <Card><p className="font-display text-[16px] font-extrabold">Tag a helper</p><p className="text-[12px] text-mute">They'll get a notification to answer.</p>
-            <div className="mt-3 flex flex-col gap-2">{peers.length === 0 && <p className="text-[13px] text-mute">No classmates in this module yet.</p>}
-              {peers.map((e) => { const on = tagged.includes(e.user!.id); return (
-                <button type="button" key={e.user!.id} onClick={() => setTagged(on ? tagged.filter((x) => x !== e.user!.id) : [...tagged, e.user!.id])} className={cn("flex items-center gap-3 rounded-[18px] p-3 text-left", on ? "bg-brand/10" : "bg-ground")}>
-                  <Avatar name={e.user!.full_name} url={e.user!.avatar_url} size={36} ring={e.status === "completed" ? "win" : undefined} />
-                  <span className="flex-1 text-[14px] font-semibold">{e.user!.full_name}<span className="block text-[12px] font-normal text-mute">{e.status === "completed" ? "Completed this module" : "Taking it now"}</span></span>
-                  <span className="text-[13px] font-bold text-brand">{on ? "✓ Tagged" : "Tag"}</span>
-                </button>); })}</div></Card>
-        )}
-        <PrimaryButton type="submit" disabled={busy}>{busy ? "Publishing…" : "Just Ask"} <span className="text-[20px]">+</span></PrimaryButton>
-      </form>
-    </div>
-  );
-}
+import { useState } from 'react';
+import { createFileRoute,Link,useNavigate } from '@tanstack/react-router';
+import { useQuery,useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/lib/auth';
+import { coursesQuery } from '@/lib/queries';
+import { communitiesQuery,peopleQuery } from '@/lib/social-queries';
+import { pageHead } from '@/lib/head';
+import { BackHeader,EmptyState } from '@/components/jask/ui';
+import { FilePicker,uploadReferences } from '@/components/jask/Attachments';
+export const Route=createFileRoute('/_authenticated/ask')({validateSearch:(s:Record<string,unknown>)=>({course:typeof s['course']==='string'?s['course']:undefined,community:typeof s['community']==='string'?s['community']:undefined}),head:()=>pageHead('Just Ask','Post a question and tag relevant people and communities.'),component:Ask});
+function Ask(){const initial=Route.useSearch();const {userId,profile}=useAuth();const nav=useNavigate();const qc=useQueryClient();const courses=useQuery(coursesQuery());const communities=useQuery(communitiesQuery());const [course,setCourse]=useState(initial.course??'');const [title,setTitle]=useState('');const [body,setBody]=useState('');const [tag,setTag]=useState('');const [tagged,setTagged]=useState<string[]>([]);const [groups,setGroups]=useState<string[]>(initial.community?[initial.community]:[]);const [s,setS]=useState('');const people=useQuery(peopleQuery(s));const [files,setFiles]=useState<File[]>([]);const [busy,setBusy]=useState(false);if(profile&&!profile.onboarded)return <EmptyState title="Finish your profile first" body="Select your college and department." action={<Link to="/onboarding" className="text-brand">Set up profile</Link>}/>;const publish=async(e:React.FormEvent)=>{e.preventDefault();if(!userId)return;if(!course&&!groups.length){toast.error('Select a course or tag a community');return;}setBusy(true);let postedId:string|undefined;try{const {data,error}=await supabase.from('questions').insert({author_id:userId,institution_id:profile?.institution_id??null,course_id:course||null,title:title.trim(),body:body.trim(),tag:tag.trim()||null}).select('id').single();if(error)throw error;postedId=data.id;if(groups.length){const {error}=await supabase.from('question_communities').insert(groups.map(community_id=>({question_id:data.id,community_id})));if(error)throw error}if(tagged.length){const {error}=await supabase.from('helper_invites').insert(tagged.map(helper_id=>({question_id:data.id,helper_id,inviter_id:userId})));if(error)throw error}await uploadReferences(files,userId,data.id);qc.invalidateQueries({queryKey:['feed']});qc.invalidateQueries({queryKey:['communities']});toast.success('Question published');nav({to:'/q/$questionId',params:{questionId:data.id}});}catch(e){toast.error(postedId?`Question posted, but a reference or tag failed: ${(e as Error).message}`:(e as Error).message);if(postedId)nav({to:'/q/$questionId',params:{questionId:postedId}})}finally{setBusy(false)}};const toggle=(ids:string[],id:string)=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id];const field='mt-1 w-full rounded-lg border bg-card px-3 py-3 text-sm outline-none focus:border-brand';return <><BackHeader title="Just Ask"/><form onSubmit={publish} className="space-y-5 px-4 pb-12"><label className="block text-sm font-semibold">Course<select aria-label="Course" value={course} onChange={e=>setCourse(e.target.value)} className={field}><option value="">Community post (no course)</option>{courses.data?.filter(c=>c.institution_id===profile?.institution_id).map(c=><option key={c.id} value={c.id}>{c.name} · {c.code}</option>)}</select></label><Link to="/courses" className="block text-xs text-brand">Don't see your course? Add it</Link><label className="block text-sm font-semibold">Question<input aria-label="Question" required minLength={8} maxLength={200} value={title} onChange={e=>setTitle(e.target.value)} className={field} placeholder="What would you like to ask?"/></label><label className="block text-sm font-semibold">Details<textarea aria-label="Details" rows={5} maxLength={5000} value={body} onChange={e=>setBody(e.target.value)} onPaste={e=>{const images=Array.from(e.clipboardData.files);if(images.length){e.preventDefault();setFiles(f=>[...f,...images])}}} className={field}/></label><FilePicker files={files} onChange={setFiles}/><label className="block text-sm font-semibold">Topic<input aria-label="Topic" maxLength={40} value={tag} onChange={e=>setTag(e.target.value)} className={field}/></label><section><h2 className="mb-2 font-bold">Tag communities</h2><div className="flex flex-wrap gap-2">{communities.data?.map(c=><label key={c.id} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={groups.includes(c.id)} onChange={()=>setGroups(toggle(groups,c.id))}/>c/{c.slug}</label>)}{communities.data?.length===0&&<Link to="/communities" className="text-sm text-brand">Create a community</Link>}</div></section><section><h2 className="font-bold">Tag people</h2><input aria-label="Find people to tag" placeholder="Search people" value={s} onChange={e=>setS(e.target.value)} className={field}/><div className="mt-3 max-h-48 space-y-3 overflow-y-auto">{people.data?.filter(p=>p.id!==userId).map(p=><label key={p.id} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={tagged.includes(p.id)} onChange={()=>setTagged(toggle(tagged,p.id))}/>{p.full_name}</label>)}</div></section><Button className="h-12 w-full rounded-full" disabled={busy} type="submit">{busy?'Publishing…':'Publish question'}</Button></form></>}

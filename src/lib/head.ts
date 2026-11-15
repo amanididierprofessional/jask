@@ -1,0 +1,1 @@
+export function pageHead(title: string, description: string) { return { meta: [{ title: `${title} — Jask` }, { name: 'description', content: description }, { property: 'og:title', content: `${title} — Jask` }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }; }
