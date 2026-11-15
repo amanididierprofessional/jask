@@ -99,6 +99,84 @@ export type Database = {
           },
         ]
       }
+      communities: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string
+          id: string
+          institution_id: string | null
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string
+          id?: string
+          institution_id?: string | null
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string
+          id?: string
+          institution_id?: string | null
+          name?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communities_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "communities_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_members: {
+        Row: {
+          community_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          community_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          community_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_members_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
@@ -143,22 +221,28 @@ export type Database = {
       }
       departments: {
         Row: {
+          campus: string | null
           code: string
           id: string
           institution_id: string
           name: string
+          source_url: string | null
         }
         Insert: {
+          campus?: string | null
           code: string
           id?: string
           institution_id: string
           name: string
+          source_url?: string | null
         }
         Update: {
+          campus?: string | null
           code?: string
           id?: string
           institution_id?: string
           name?: string
+          source_url?: string | null
         }
         Relationships: [
           {
@@ -273,11 +357,47 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          campus: boolean
+          communities: boolean
+          courses: boolean
+          enabled: boolean
+          push_enabled: boolean
+          user_id: string
+        }
+        Insert: {
+          campus?: boolean
+          communities?: boolean
+          courses?: boolean
+          enabled?: boolean
+          push_enabled?: boolean
+          user_id: string
+        }
+        Update: {
+          campus?: boolean
+          communities?: boolean
+          courses?: boolean
+          enabled?: boolean
+          push_enabled?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           actor_id: string | null
           created_at: string
           id: string
+          push_sent_at: string | null
           question_id: string | null
           read: boolean
           type: string
@@ -287,6 +407,7 @@ export type Database = {
           actor_id?: string | null
           created_at?: string
           id?: string
+          push_sent_at?: string | null
           question_id?: string | null
           read?: boolean
           type: string
@@ -296,6 +417,7 @@ export type Database = {
           actor_id?: string | null
           created_at?: string
           id?: string
+          push_sent_at?: string | null
           question_id?: string | null
           read?: boolean
           type?: string
@@ -325,11 +447,67 @@ export type Database = {
           },
         ]
       }
+      post_references: {
+        Row: {
+          answer_id: string | null
+          created_at: string
+          id: string
+          mime_type: string
+          name: string
+          owner_id: string
+          path: string
+          question_id: string
+        }
+        Insert: {
+          answer_id?: string | null
+          created_at?: string
+          id?: string
+          mime_type: string
+          name: string
+          owner_id: string
+          path: string
+          question_id: string
+        }
+        Update: {
+          answer_id?: string | null
+          created_at?: string
+          id?: string
+          mime_type?: string
+          name?: string
+          owner_id?: string
+          path?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_references_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "answers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_references_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_references_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          department_id: string | null
           full_name: string
           grad_year: number | null
           id: string
@@ -337,6 +515,7 @@ export type Database = {
           major: string | null
           onboarded: boolean
           role_title: string | null
+          study_year: number | null
           studying_course_id: string | null
           studying_until: string | null
         }
@@ -344,6 +523,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department_id?: string | null
           full_name?: string
           grad_year?: number | null
           id: string
@@ -351,6 +531,7 @@ export type Database = {
           major?: string | null
           onboarded?: boolean
           role_title?: string | null
+          study_year?: number | null
           studying_course_id?: string | null
           studying_until?: string | null
         }
@@ -358,6 +539,7 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department_id?: string | null
           full_name?: string
           grad_year?: number | null
           id?: string
@@ -365,10 +547,18 @@ export type Database = {
           major?: string | null
           onboarded?: boolean
           role_title?: string | null
+          study_year?: number | null
           studying_course_id?: string | null
           studying_until?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_institution_id_fkey"
             columns: ["institution_id"]
@@ -381,6 +571,98 @@ export type Database = {
             columns: ["studying_course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_devices: {
+        Row: {
+          created_at: string
+          id: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_communities: {
+        Row: {
+          community_id: string
+          question_id: string
+        }
+        Insert: {
+          community_id: string
+          question_id: string
+        }
+        Update: {
+          community_id?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_communities_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "communities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_communities_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_votes: {
+        Row: {
+          created_at: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_votes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

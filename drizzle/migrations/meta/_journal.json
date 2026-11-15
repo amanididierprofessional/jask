@@ -8,6 +8,13 @@
       "when": 1794662547749,
       "tag": "0000_jask_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794778674007,
+      "tag": "0001_real_communities_and_notification_preferences",
+      "breakpoints": true
     }
   ]
 }
