@@ -34,7 +34,7 @@ function AskAction({ mobile = false, active = false }: { mobile?: boolean; activ
         )}
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 11.2a7.2 7.2 0 0 1-7.2 7.2H6l-3 2v-6.2a7.2 7.2 0 1 1 17  -3Z" />
+          <path d="M20 11.5a8 8 0 0 1-8 8H5l-2 1.5v-6A8 8 0 1 1 20 11.5Z" />
           <path d="M8 10h8M8 13.5h5" />
         </svg>
         <span className="text-[10px] font-semibold leading-none">Ask</span>
