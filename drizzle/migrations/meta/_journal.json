@@ -29,6 +29,13 @@
       "when": 1794778756739,
       "tag": "0003_ranked_feed_and_safe_profile_validation",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794804154603,
+      "tag": "0004_protect_profiles_and_enrollments",
+      "breakpoints": true
     }
   ]
 }

@@ -34,3 +34,4 @@ use the editor.
 - Store per-user notification preferences and device tokens behind owner-only policies; deliver background notifications through an authenticated scheduled server route.
 - Use private reference storage with signed URLs and author-owned metadata; this preserves ownership while making published references readable.
 - Home-screen installation uses a manifest only; the Firebase messaging worker is for notifications, never an offline app cache.
+- Read full profiles and enrollments only as their owner; use the explicit display-only `public_profiles` view for attribution and tagging so public conversations never expose private account details or course subscriptions.
