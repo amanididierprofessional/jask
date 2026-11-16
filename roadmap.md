@@ -1,4 +1,6 @@
 # Jask completion
+- [x] Merge Home feeds into sticky tabs with exact unread course counts and campus/community dots; checked signed-in phone/desktop and legacy links, 12 tests passed.
+- [ ] Finish phone notification readiness: Firebase connection still lacks web app/API/VAPID settings; closed-app delivery cannot be verified until Include web push is configured.
 - [x] Removed seeded people/posts and generated-avatar fallbacks; preserved seeded college/course records referenced by real user content.
 - [x] Communities, memberships, people/community tagging, course-first home, ranked campus feed.
 - [x] Post upvotes/following, answers/replies, reference uploads and pasted images.

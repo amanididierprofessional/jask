@@ -3,6 +3,20 @@ import { supabase } from "@/integrations/supabase/client";
 
 const authorCols = "id, full_name, major, study_year, role_title, avatar_url";
 
+export const homeUpdatesQuery = (userId: string | null) => queryOptions({
+  queryKey: ['me', 'home-updates', userId], enabled: !!userId,
+  queryFn: async () => {
+    if (!userId) return [];
+    const items = [];
+    for (let offset = 0; ; offset += 1000) {
+      const {data,error} = await supabase.from('notifications').select('id,question:questions(course_id,institution_id,question_communities(community_id))').eq('user_id',userId).eq('read',false).order('id').range(offset,offset+999);
+      if (error) throw error;
+      items.push(...data.map(n=>({id:n.id,courseId:n.question?.course_id??null,campusId:n.question?.institution_id??null,communityIds:n.question?.question_communities.map(c=>c.community_id)??[]})));
+      if(data.length<1000) return items;
+    }
+  }, refetchInterval: 30_000,
+});
+
 export const coursesQuery = () =>
   queryOptions({
     queryKey: ["courses"],

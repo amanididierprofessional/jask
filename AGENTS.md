@@ -29,7 +29,7 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 
-- Keep course-first home at `/`, campus discovery at `/campus`, and real community pages separate; this avoids mixing personal subscriptions with campus discovery.
+- Keep My Courses, Campus and community discovery as Home tabs at `/`; redirect legacy discovery URLs to their Home tab and keep individual community pages separate.
 - Rank feeds in the database with actual votes, responses, unique participants and recency; avoid page-local ranking of a newest-only sample.
 - Store per-user notification preferences and device tokens behind owner-only policies; deliver background notifications through an authenticated scheduled server route.
 - Use private reference storage with signed URLs and author-owned metadata; this preserves ownership while making published references readable.
