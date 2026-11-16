@@ -28,15 +28,15 @@ function AskAction({ mobile = false, active = false }: { mobile?: boolean; activ
         to="/ask"
         search={{ course: undefined, community: undefined }}
         aria-label="Ask a question"
-        className="flex min-w-0 flex-1 flex-col items-center gap-1 py-1 text-brand"
+        className={cn(
+          'flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-2 text-mute transition-colors',
+          active && 'text-brand',
+        )}
       >
-        <span className="-mt-3 grid h-10 w-10 place-items-center rounded-full bg-brand text-brand-foreground shadow-brand">
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-6.5A7.5 7.5 0 1 1 20 11.5Z" />
-            <path d="M9.6 9a2.4 2.4 0 1 1 4.1 1.7c-.9.8-1.7 1.1-1.7 2.3" />
-            <path d="M12 16.2h.01" />
-          </svg>
-        </span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 11.2a7.2 7.2 0 0 1-7.2 7.2H6l-3 2v-6.2a7.2 7.2 0 1 1 17  -3Z" />
+          <path d="M8 10h8M8 13.5h5" />
+        </svg>
         <span className="text-[10px] font-semibold leading-none">Ask</span>
       </Link>
     );
@@ -129,7 +129,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      {!path.startsWith('/q/') && !path.startsWith('/ask') && (
+      {!path.startsWith('/q/') && (
         <nav className="fixed bottom-4 left-3 right-3 z-30 flex h-16 items-center justify-around rounded-full border bg-card px-1 shadow-float md:hidden">
           {tabs.map((tab) => (
             <Fragment key={tab.to}>
@@ -144,7 +144,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <tab.icon className="h-5 w-5" />
                 <span className="text-[10px] font-semibold">{tab.label}</span>
               </Link>
-              {tab.to === '/' && <AskAction mobile />}
+              {tab.to === '/' && <AskAction mobile active={path.startsWith('/ask')} />}
             </Fragment>
           ))}
         </nav>
