@@ -1,4 +1,8 @@
 # Jask completion
+- [ ] Add blue Ask action after Home in bottom navigation and compact Ask links beside feed titles; place the mobile logo above Home tabs.
+- [ ] Show rounded notification choices after signup and for new users reaching onboarding.
+- [ ] Replace the profile notification list with a top-right bell and recent-alerts dialog; keep badges, toasts and push delivery.
+- [ ] Verify Firebase web-push configuration and browser registration after reconnecting.
 - [x] Merge Home feeds into sticky tabs with exact unread course counts and campus/community dots; checked signed-in phone/desktop and legacy links, 12 tests passed.
 - [ ] Finish phone notification readiness: Firebase connection still lacks web app/API/VAPID settings; closed-app delivery cannot be verified until Include web push is configured.
 - [x] Removed seeded people/posts and generated-avatar fallbacks; preserved seeded college/course records referenced by real user content.
