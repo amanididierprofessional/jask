@@ -36,13 +36,6 @@
       "when": 1794804154603,
       "tag": "0004_protect_profiles_and_enrollments",
       "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1794948201759,
-      "tag": "0005_community_profile_images",
-      "breakpoints": true
     }
   ]
 }
