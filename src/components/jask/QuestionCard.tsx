@@ -7,7 +7,6 @@ import { timeAgo } from '@/lib/format';
 import { Avatar } from './ui';
 import { PostVote } from './PostVote';
 import { ReferenceItems } from './Attachments';
-import { cn } from '@/lib/utils';
 
 export function QuestionCard({ q }: { q: FeedItem }) {
   const [expanded, setExpanded] = useState(false);

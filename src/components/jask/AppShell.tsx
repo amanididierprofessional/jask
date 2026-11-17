@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Home, Users, BookMarked, User, CircleHelp, Search, Compass } from 'lucide-react';
+import { Home, BookMarked, User, CircleHelp, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 import { notificationsQuery } from '@/lib/queries';
