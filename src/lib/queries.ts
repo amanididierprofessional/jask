@@ -51,7 +51,7 @@ export const feedQuery = (f: FeedFilter) =>
       const { data: ranked, error: rankError } = await supabase.rpc("ranked_questions", { ...(f.courseIds ? {course_ids:f.courseIds} : {}), ...(f.institutionId ? {campus_id:f.institutionId} : {}), ...(f.communityId ? {community:f.communityId} : {}), search_text: f.search?.trim() ?? "", sort_mode: f.sort ?? "hot" });
       if (rankError) throw rankError;
       if (!ranked.length) return [];
-      const { data, error } = await supabase.from("questions").select(`id, title, tag, created_at, answer_count, accepted_answer_id, course_id, author:public_profiles!questions_author_id_fkey(${authorCols}), course:courses(id, code, name), references:post_references!post_references_question_id_fkey(id, path, name, mime_type, answer_id)`).in("id", ranked.map(r => r.id));
+      const { data, error } = await supabase.from("questions").select(`id, title, body, tag, created_at, answer_count, accepted_answer_id, course_id, author:public_profiles!questions_author_id_fkey(${authorCols}), course:courses(id, code, name), references:post_references!post_references_question_id_fkey(id, path, name, mime_type, answer_id)`).in("id", ranked.map(r => r.id));
       if (error) throw error;
       return ranked.flatMap(r => { const item = data.find(q => q.id === r.id); return item ? [item] : []; });
     },
