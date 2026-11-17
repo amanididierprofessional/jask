@@ -18,7 +18,7 @@ export function FilePicker({ files, onChange }: { files: File[]; onChange: (file
 
 export async function uploadReferences(files: File[], userId: string, questionId: string, answerId?: string) {
   for (const file of files) {
-    if (file.size > 100 * 1024 * 1024) throw new Error(`${file.name} exceeds the 100 MB upload limit`);
+    if (file.size > 20 * 1024 * 1024) throw new Error(`${file.name} exceeds the 20 MB upload limit`);
     const path = `${userId}/${crypto.randomUUID()}/${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
     const { error } = await supabase.storage.from('references').upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
     if (error) throw new Error(`Could not upload ${file.name}: ${error.message}`);
