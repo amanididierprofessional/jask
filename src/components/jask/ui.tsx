@@ -46,13 +46,13 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <article className={cn("rounded-[28px] bg-card p-5 shadow-card", className)}>{children}</article>;
+  return <article className={cn("bg-card", className)}>{children}</article>;
 }
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-1.5 font-display text-[13px] font-black text-brand", className)}>
-      <span className="grid h-8 w-8 place-items-center rounded-full bg-brand text-brand-foreground"><CircleHelp className="h-6 w-6" strokeWidth={2.5} /></span>
+    <div className={cn("flex items-center gap-1.5 font-display text-[15px] font-black text-brand", className)}>
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-brand text-brand-foreground"><CircleHelp className="h-5 w-5" strokeWidth={2.5} /></span>
       Jask
     </div>
   );
@@ -65,13 +65,13 @@ export function BackHeader({ title, subtitle, right, to = "/" }: { title: string
         type="button"
         onClick={() => (window.history.length > 1 ? window.history.back() : (window.location.href = to))}
         aria-label="Back"
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card shadow-card"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-card"
       >
         <ChevronLeft className="h-[18px] w-[18px]" strokeWidth={2.2} />
       </button>
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-[20px] font-black leading-tight">{title}</h1>
-        {subtitle && <p className="truncate text-[12px] font-semibold text-brand">{subtitle}</p>}
+        <h1 className="truncate text-[18px] font-bold leading-tight">{title}</h1>
+        {subtitle && <p className="truncate text-[12px] font-medium text-mute">{subtitle}</p>}
       </div>
       {right}
     </header>
@@ -80,28 +80,26 @@ export function BackHeader({ title, subtitle, right, to = "/" }: { title: string
 
 export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) {
   return (
-    <Card className="flex flex-col items-center px-6 py-10 text-center">
+    <div className="flex flex-col items-center border-b px-6 py-14 text-center">
       <span className="grid h-12 w-12 place-items-center rounded-full bg-brand/10 font-display text-[20px] font-black text-brand">?</span>
-      <p className="mt-3 font-display text-[18px] font-extrabold">{title}</p>
+      <p className="mt-3 text-[17px] font-bold">{title}</p>
       <p className="mt-1 max-w-xs text-[14px] text-mute">{body}</p>
       {action && <div className="mt-5">{action}</div>}
-    </Card>
+    </div>
   );
 }
 
 export function CardSkeleton() {
   return (
-    <Card className="animate-pulse">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-ground" />
-        <div className="flex-1 space-y-2">
-          <div className="h-3 w-24 rounded bg-ground" />
-          <div className="h-2.5 w-12 rounded bg-ground" />
-        </div>
+    <div className="animate-pulse border-b px-4 py-4">
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-6 rounded-full bg-muted" />
+        <div className="h-3 w-28 rounded bg-muted" />
       </div>
-      <div className="mt-4 h-4 w-11/12 rounded bg-ground" />
-      <div className="mt-2 h-4 w-2/3 rounded bg-ground" />
-    </Card>
+      <div className="mt-3 h-4 w-11/12 rounded bg-muted" />
+      <div className="mt-2 h-4 w-2/3 rounded bg-muted" />
+      <div className="mt-4 h-40 w-full rounded-md bg-muted" />
+    </div>
   );
 }
 
@@ -110,7 +108,7 @@ export function PrimaryButton({ children, className, ...props }: React.ButtonHTM
     <button
       {...props}
       className={cn(
-        "flex h-14 items-center justify-center gap-2 rounded-full bg-brand px-6 font-display text-[16px] font-extrabold text-brand-foreground shadow-brand transition active:scale-[0.98] disabled:opacity-60",
+        "flex h-12 items-center justify-center gap-2 rounded-full bg-brand px-6 font-display text-[15px] font-extrabold text-brand-foreground shadow-brand transition active:scale-[0.98] disabled:opacity-60",
         className,
       )}
     >
