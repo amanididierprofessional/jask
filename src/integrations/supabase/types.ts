@@ -120,6 +120,7 @@ export type Database = {
           description: string
           id: string
           institution_id: string | null
+          image_path: string | null
           name: string
           slug: string
         }
@@ -129,6 +130,7 @@ export type Database = {
           description?: string
           id?: string
           institution_id?: string | null
+          image_path?: string | null
           name: string
           slug: string
         }
@@ -138,6 +140,7 @@ export type Database = {
           description?: string
           id?: string
           institution_id?: string | null
+          image_path?: string | null
           name?: string
           slug?: string
         }
@@ -908,8 +911,10 @@ export type Database = {
         Args: never
         Returns: {
           activity: number
+          creator_id: string
           description: string
           id: string
+          image_path: string | null
           institution_id: string
           members: number
           name: string
