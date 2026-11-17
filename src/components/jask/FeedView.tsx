@@ -15,7 +15,7 @@ export function FeedView({
   communityId,
 }: {
   mine?: boolean;
-  communityId?: string | undefined;
+  communityId?: string;
 }) {
   const { userId, profile, enrolledCourseIds } = useAuth();
   const [search, setSearch] = useState('');
@@ -38,7 +38,6 @@ export function FeedView({
 
   return (
     <div className="pb-20 md:pb-6">
-      {/* Search bar — top, Reddit style */}
       <div className="sticky top-0 z-10 border-b bg-background/95 px-3 py-2 backdrop-blur sm:px-4">
         <div className="flex items-center gap-2 rounded-full border bg-muted/50 px-3 transition-colors focus-within:border-brand/40 focus-within:bg-card">
           <Search className="h-4 w-4 shrink-0 text-mute" />
@@ -52,7 +51,6 @@ export function FeedView({
         </div>
       </div>
 
-      {/* Sort pills */}
       <div className="flex items-center gap-1 border-b px-3 py-2 sm:px-4">
         {(['hot', 'new', 'top'] as const).map((v) => (
           <button
@@ -75,7 +73,7 @@ export function FeedView({
         {!mine && !communityId && (
           <Link
             to="/ask"
-            search={{ course: undefined, community: communityId }}
+            search={{ course: undefined, community: undefined }}
             className="ml-auto rounded-full bg-brand px-3 py-1.5 text-[13px] font-bold text-brand-foreground"
           >
             Ask

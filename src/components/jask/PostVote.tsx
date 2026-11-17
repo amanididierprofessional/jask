@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
@@ -42,7 +42,7 @@ export function PostVote({ id }: { id: string }) {
           voted ? 'text-brand' : 'text-mute',
         )}
       >
-        <ArrowBigUp className={cn('h-5 w-5', voted && 'fill-current')} strokeWidth={1.6} />
+        <ArrowUp className={cn('h-4 w-4', voted && 'fill-current')} strokeWidth={2.2} />
         <span className="min-w-[1ch] font-semibold tabular-nums">{count}</span>
       </button>
       <span className="h-5 w-px bg-border" />
@@ -53,7 +53,7 @@ export function PostVote({ id }: { id: string }) {
         disabled
         className="flex h-8 items-center rounded-r-full px-2 text-mute opacity-50"
       >
-        <ArrowBigDown className="h-5 w-5" strokeWidth={1.6} />
+        <ArrowDown className="h-4 w-4" strokeWidth={2.2} />
       </button>
     </div>
   );

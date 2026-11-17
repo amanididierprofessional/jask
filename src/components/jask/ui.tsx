@@ -46,7 +46,7 @@ export function Chip({ children, className }: { children: ReactNode; className?:
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <article className={cn("bg-card", className)}>{children}</article>;
+  return <article className={cn("rounded-xl border bg-card p-4", className)}>{children}</article>;
 }
 
 export function BrandMark({ className }: { className?: string }) {
