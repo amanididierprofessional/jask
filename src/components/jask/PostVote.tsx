@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowUp, ArrowDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth';
 import { postVotesQuery } from '@/lib/social-queries';
 import { cn } from '@/lib/utils';
 
+/** Classic Reddit-style vertical vote widget */
 export function PostVote({ id }: { id: string }) {
   const { userId } = useAuth();
   const qc = useQueryClient();
@@ -30,7 +30,8 @@ export function PostVote({ id }: { id: string }) {
   });
 
   return (
-    <div className="flex items-center rounded-full border bg-card">
+    <div className="flex w-10 shrink-0 flex-col items-center gap-0.5 pt-0.5">
+      {/* Upvote */}
       <button
         type="button"
         title="Upvote"
@@ -38,22 +39,56 @@ export function PostVote({ id }: { id: string }) {
         disabled={vote.isPending}
         onClick={() => vote.mutate()}
         className={cn(
-          'flex h-8 items-center gap-1 rounded-l-full px-2.5 text-sm transition-colors hover:bg-muted',
-          voted ? 'text-brand' : 'text-mute',
+          'flex h-7 w-7 items-center justify-center rounded-sm transition-colors',
+          voted
+            ? 'text-[#FF4500] hover:bg-[#FF4500]/10'
+            : 'text-[#878A8C] hover:bg-black/5 hover:text-[#FF4500]',
         )}
       >
-        <ArrowUp className={cn('h-4 w-4', voted && 'fill-current')} strokeWidth={2.2} />
-        <span className="min-w-[1ch] font-semibold tabular-nums">{count}</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill={voted ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth={voted ? 0 : 1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 4l7 8h-4v8H9v-8H5l7-8z" />
+        </svg>
       </button>
-      <span className="h-5 w-px bg-border" />
+
+      {/* Score */}
+      <span
+        className={cn(
+          'min-w-[1.5ch] text-center text-[12px] font-bold tabular-nums leading-none',
+          voted ? 'text-[#FF4500]' : 'text-[#1A1A1B]',
+        )}
+      >
+        {count}
+      </span>
+
+      {/* Downvote (placeholder for now) */}
       <button
         type="button"
         title="Downvote (coming soon)"
         aria-label="Downvote"
         disabled
-        className="flex h-8 items-center rounded-r-full px-2 text-mute opacity-50"
+        className="flex h-7 w-7 items-center justify-center rounded-sm text-[#878A8C] opacity-50"
       >
-        <ArrowDown className="h-4 w-4" strokeWidth={2.2} />
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 20l-7-8h4V4h6v8h4l-7 8z" />
+        </svg>
       </button>
     </div>
   );
