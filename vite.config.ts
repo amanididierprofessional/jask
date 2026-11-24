@@ -1,19 +1,34 @@
-// Lovable TanStack Start config.
-// We disable the Cloudflare adapter and force the Vercel Nitro preset
-// so GitHub → Vercel deploys work correctly.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
+import tailwindcss from "@tailwindcss/vite";
+import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  // Critical: stop Lovable from forcing Cloudflare Workers output
-  cloudflare: false,
+  plugins: [
+    // Path aliases (@/)
+    tsConfigPaths({
+      projects: ["./tsconfig.json"],
+    }),
 
-  tanstackStart: {
-    // Keep the custom server entry (SSR error wrapper)
-    server: { entry: "server" },
-  },
+    // TanStack Start (must come before React)
+    tanstackStart({
+      // Keep the custom server entry that wraps SSR errors
+      server: {
+        entry: "server",
+      },
+    }),
 
-  // Force Nitro to emit Vercel Functions
-  nitro: {
-    preset: "vercel",
-  },
+    // Nitro with Vercel preset — this is the key for Vercel deploys
+    nitro({
+      preset: "vercel",
+    }),
+
+    // React
+    viteReact(),
+
+    // Tailwind v4
+    tailwindcss(),
+  ],
 });
